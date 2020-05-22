@@ -40,4 +40,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
 
 
+    implementation 'com.github.khizar1556.MKVideoPlayer:mkvideoplayer:0.1.5'
+
+
 }

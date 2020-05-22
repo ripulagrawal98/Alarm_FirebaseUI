@@ -22,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent mintent = new Intent(context, AfterAlarm.class);
 //        mintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mintent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        System.out.println("Checking for pending intent "+pendingIntent);
 //        nb.setContentIntent(pendingIntent)
 //        .setAutoCancel(true);
         nb.setPriority(NotificationCompat.PRIORITY_DEFAULT)
