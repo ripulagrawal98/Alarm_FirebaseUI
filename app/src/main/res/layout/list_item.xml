@@ -15,31 +15,37 @@
         android:id="@+id/img1"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+
         android:src="@mipmap/ic_launcher"/>
 
-<LinearLayout
-    android:id="@+id/root"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-    <TextView
-        android:id="@+id/Label"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/root"
+        android:layout_width="276dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="8dp"
-        android:text="Label of Alarm"
-        />
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/Time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginStart="8dp"
-        android:text="Time of Alarm"
-        />
+        <TextView
+            android:id="@+id/Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="0dp"
+            android:text="Label of Alarm" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/Time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="0dp"
+            android:text="Time of Alarm" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_delete_black_24dp"/>
 
 </LinearLayout>
