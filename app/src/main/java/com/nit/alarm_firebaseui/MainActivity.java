@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
                                                                     @Override
                                                                     public Alarm parseSnapshot(@NonNull DataSnapshot snapshot) {
                                                                         return new Alarm(snapshot.child("Label").getValue().toString(),
-                                                                                        snapshot.child("Time").getValue().toString());
+                                                                                        snapshot.child("Time").getValue().toString(),
+                                                                                        snapshot.child("Media URI").toString());
                                                                     }
                                                                 })
                                                                 .build();
@@ -122,106 +123,50 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.setLabelTitle(alarm.getMlabel());
                 viewHolder.setTimeTitle(alarm.getMtime());
 
-                // Creating adapter for spinner
-                dataAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, categories);
-                // Drop down layout style - list view with radio button
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                viewHolder.mspinner.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) MainActivity.this);
-                viewHolder.mspinner.setAdapter(dataAdapter);
-
-                viewHolder.mspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                viewHolder.delete.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position1, long id) {
+                    public void onClick(View v) {
 
-                        System.out.println("Checking for position value in spinner "+parent.getItemAtPosition(position1));
-                        Toast.makeText(getApplicationContext(), categories.get(position1),Toast.LENGTH_SHORT).show();
+                        final DatabaseReference dataref_delete = FirebaseDatabase.getInstance().getReference("Alarms");
 
-                        if(parent.getItemAtPosition(position1).toString() == "Delete")
-                        {
-                            final DatabaseReference dataref_delete = FirebaseDatabase.getInstance().getReference("Alarms");
-                            AlertDialog myQuittingDialogBox =  new AlertDialog.Builder(MainActivity.this)
-                                    // set message, title, and icon
-                                    .setTitle("Delete")
-                                    .setMessage("Do you want to Delete")
-                                    .setIcon(R.drawable.ic_delete_black_24dp)
 
-                                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        AlertDialog myQuittingDialogBox =  new AlertDialog.Builder(MainActivity.this)
+                                 // set message, title, and icon
+                                .setTitle("Delete")
+                                .setMessage("Do you want to Delete")
+                                .setIcon(R.drawable.ic_delete_black_24dp)
 
-                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
 
-                                            dataref_delete.child(getRef(position).getKey())
-                                                    .removeValue()
-                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            Toast.makeText(getApplicationContext(),"Item is Deleted",Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-                                        }
+                                    public void onClick(DialogInterface dialog, int whichButton) {
 
-                                    })
-                                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
+                                        dataref_delete.child(getRef(position).getKey())
+                                                .removeValue()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        Toast.makeText(getApplicationContext(),"Item is Deleted",Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
 
-                                            dialog.cancel();
+                                })
+                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                                        }
-                                    })
-                                    .create();
-                            myQuittingDialogBox.show();
-                        }
+                                        dialog.cancel();
 
-                    }
+                                    }
+                                })
+                                .create();
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
+                        myQuittingDialogBox.show();
+
+
+
 
                     }
                 });
-//                viewHolder.mspinner.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//
-//                        final DatabaseReference dataref_delete = FirebaseDatabase.getInstance().getReference("Alarms");
-//
-//
-//                        AlertDialog myQuittingDialogBox =  new AlertDialog.Builder(MainActivity.this)
-//                                 // set message, title, and icon
-//                                .setTitle("Delete")
-//                                .setMessage("Do you want to Delete")
-//                                .setIcon(R.drawable.ic_delete_black_24dp)
-//
-//                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-//
-//                                    public void onClick(DialogInterface dialog, int whichButton) {
-//
-//                                        dataref_delete.child(getRef(position).getKey())
-//                                                .removeValue()
-//                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                                    @Override
-//                                                    public void onComplete(@NonNull Task<Void> task) {
-//                                                        Toast.makeText(getApplicationContext(),"Item is Deleted",Toast.LENGTH_SHORT).show();
-//                                                    }
-//                                                });
-//                                    }
-//
-//                                })
-//                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int which) {
-//
-//                                        dialog.cancel();
-//
-//                                    }
-//                                })
-//                                .create();
-//
-//                        myQuittingDialogBox.show();
-//
-//
-//
-//
-//                    }
-//                });
 
                 viewHolder.root.setOnClickListener(new View.OnClickListener(){
 
@@ -252,9 +197,10 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot looping : dataSnapshot.getChildren()){
                     String label = looping.child("Label").getValue(String.class);
-
                     String time = looping.child("Time").getValue(String.class);
-                    Alarm userref = new Alarm(label,time);
+                    String media = looping.child("Media URI").getValue(String.class);
+
+                    Alarm userref = new Alarm(label,time,media);
 
                     alarm_data.add(userref);
 
@@ -291,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
             Alarm user = alarm_data.get(i);
             String nextTime = user.getMtime().substring(0,2) + ":" + user.getMtime().substring(3);
 
+
             int Hour = Integer.parseInt(nextTime.substring(0,2));
             int Minute = Integer.parseInt(nextTime.substring(3));
             System.out.println("Print the time "+nextTime);
@@ -315,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("IS this Schedule time calling");
         for(i = 0;i<alarm_data.size();i++)
         {
+            String media_uri = alarm_data.get(i).getMedia_uri();
             System.out.println("\n Value of totoal minutes of currenthour "+total_currentminute+"\n value of i is "+ i );
             System.out.println("\n"+ i + " element of ALarmList "+ AlarmList.get(i));
             if(total_currentminute <= AlarmList.get(i)){
@@ -325,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Check the value of hour :"+hour+" Minute: "+minute);
 
                 Intent activate = new Intent(MainActivity.this, AlarmReceiver.class);
+                activate.putExtra("Media URL",media_uri);
+
 //                System.out.println("Intent Initialization");
 
                 PendingIntent alarmIntent = PendingIntent.getBroadcast(this, i, activate, 0);
@@ -369,20 +319,20 @@ public class MainActivity extends AppCompatActivity {
         public LinearLayout root;
         public TextView Label;
         public TextView Time;
-//        public ImageView delete;
-        public Spinner mspinner;
+        public ImageView delete;
+//        public Spinner mspinner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             root = itemView.findViewById(R.id.root);
             Label = itemView.findViewById(R.id.Label);
             Time = itemView.findViewById(R.id.Time);
-            mspinner = itemView.findViewById(R.id.spinner1);
+//            mspinner = itemView.findViewById(R.id.spinner1);
 
-//            delete = itemView.findViewById(R.id.delete);
+            delete = itemView.findViewById(R.id.delete);
 
 
-            // Spinner Drop down elements
+
 
 
         }
