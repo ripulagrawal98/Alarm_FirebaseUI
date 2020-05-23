@@ -15,8 +15,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,10 +41,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
+   private List<String> categories = new ArrayList<String>();
+    private ArrayAdapter<String> dataAdapter;
+
 //    private TextView empty_view;
     private FloatingActionButton fab;
 
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler);
 //        empty_view = (TextView)findViewById(R.id.empty_view);
         fab = (FloatingActionButton)findViewById(R.id.fab);
+        categories.add("Delete");
+        categories.add("Edit Alarm");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
         mLinearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setHasFixedSize(true);
+
+
+
         fetch();
         scheduleALarm();
     }
@@ -109,63 +121,125 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position, @NonNull Alarm alarm) {
                 viewHolder.setLabelTitle(alarm.getMlabel());
                 viewHolder.setTimeTitle(alarm.getMtime());
-                viewHolder.delete.setOnClickListener(new View.OnClickListener() {
+
+                // Creating adapter for spinner
+                dataAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, categories);
+                // Drop down layout style - list view with radio button
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                viewHolder.mspinner.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) MainActivity.this);
+                viewHolder.mspinner.setAdapter(dataAdapter);
+
+                viewHolder.mspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onItemSelected(AdapterView<?> parent, View view, int position1, long id) {
 
-                        final DatabaseReference dataref_delete = FirebaseDatabase.getInstance().getReference("Alarms");
+                        System.out.println("Checking for position value in spinner "+parent.getItemAtPosition(position1));
+                        Toast.makeText(getApplicationContext(), categories.get(position1),Toast.LENGTH_SHORT).show();
 
+                        if(parent.getItemAtPosition(position1).toString() == "Delete")
+                        {
+                            final DatabaseReference dataref_delete = FirebaseDatabase.getInstance().getReference("Alarms");
+                            AlertDialog myQuittingDialogBox =  new AlertDialog.Builder(MainActivity.this)
+                                    // set message, title, and icon
+                                    .setTitle("Delete")
+                                    .setMessage("Do you want to Delete")
+                                    .setIcon(R.drawable.ic_delete_black_24dp)
 
-                        AlertDialog myQuittingDialogBox =  new AlertDialog.Builder(MainActivity.this)
-                                 // set message, title, and icon
-                                .setTitle("Delete")
-                                .setMessage("Do you want to Delete")
-                                .setIcon(R.drawable.ic_delete_black_24dp)
+                                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
 
-                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int whichButton) {
 
-                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                            dataref_delete.child(getRef(position).getKey())
+                                                    .removeValue()
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Toast.makeText(getApplicationContext(),"Item is Deleted",Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                        }
 
-                                        dataref_delete.child(getRef(position).getKey())
-                                                .removeValue()
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        Toast.makeText(getApplicationContext(),"Item is Deleted",Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
-                                    }
+                                    })
+                                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                })
-                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
 
-                                        dialog.cancel();
+                                        }
+                                    })
+                                    .create();
+                            myQuittingDialogBox.show();
+                        }
 
-                                    }
-                                })
-                                .create();
+                    }
 
-                        myQuittingDialogBox.show();
-
-
-
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
 
                     }
                 });
+//                viewHolder.mspinner.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                        final DatabaseReference dataref_delete = FirebaseDatabase.getInstance().getReference("Alarms");
+//
+//
+//                        AlertDialog myQuittingDialogBox =  new AlertDialog.Builder(MainActivity.this)
+//                                 // set message, title, and icon
+//                                .setTitle("Delete")
+//                                .setMessage("Do you want to Delete")
+//                                .setIcon(R.drawable.ic_delete_black_24dp)
+//
+//                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+//
+//                                    public void onClick(DialogInterface dialog, int whichButton) {
+//
+//                                        dataref_delete.child(getRef(position).getKey())
+//                                                .removeValue()
+//                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                                    @Override
+//                                                    public void onComplete(@NonNull Task<Void> task) {
+//                                                        Toast.makeText(getApplicationContext(),"Item is Deleted",Toast.LENGTH_SHORT).show();
+//                                                    }
+//                                                });
+//                                    }
+//
+//                                })
+//                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+//                                    public void onClick(DialogInterface dialog, int which) {
+//
+//                                        dialog.cancel();
+//
+//                                    }
+//                                })
+//                                .create();
+//
+//                        myQuittingDialogBox.show();
+//
+//
+//
+//
+//                    }
+//                });
 
                 viewHolder.root.setOnClickListener(new View.OnClickListener(){
 
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(MainActivity.this,String.valueOf(position),Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this,String.valueOf(position),Toast.LENGTH_SHORT).show();
                     }
                 });
 
             }
+
+
         };
         mRecyclerView.setAdapter(adapter);
     }
+
+
+
 
 
     private void scheduleALarm(){
@@ -187,7 +261,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 System.out.println("Size of Alarm_Data "+alarm_data.size());
-                SetAlarm();
+                if(alarm_data.size() != 0)
+                 SetAlarm();
             }
 
             @Override
@@ -275,9 +350,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-
-
-
         }
     }
     @Override
@@ -297,14 +369,22 @@ public class MainActivity extends AppCompatActivity {
         public LinearLayout root;
         public TextView Label;
         public TextView Time;
-        public ImageView delete;
+//        public ImageView delete;
+        public Spinner mspinner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             root = itemView.findViewById(R.id.root);
             Label = itemView.findViewById(R.id.Label);
             Time = itemView.findViewById(R.id.Time);
-            delete = itemView.findViewById(R.id.delete);
+            mspinner = itemView.findViewById(R.id.spinner1);
+
+//            delete = itemView.findViewById(R.id.delete);
+
+
+            // Spinner Drop down elements
+
+
         }
 
         public void setLabelTitle(String string)
