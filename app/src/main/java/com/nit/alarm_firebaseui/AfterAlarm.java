@@ -16,7 +16,7 @@ public class AfterAlarm extends AppCompatActivity {
 
 
     private String alarm_video;
-    private String videourl = "https://firebasestorage.googleapis.com/v0/b/alarmfirebaseui.appspot.com/o/videoplayback.mp4?alt=media&token=3fae4f15-5fbc-4971-833e-91d3dc651c2e";
+//    private String videourl = "https://firebasestorage.googleapis.com/v0/b/alarmfirebaseui.appspot.com/o/videoplayback.mp4?alt=media&token=3fae4f15-5fbc-4971-833e-91d3dc651c2e";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

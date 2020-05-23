@@ -45,6 +45,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Intent calendar_intent;
+    private String mDate;
+
     private RecyclerView mRecyclerView;
    private List<String> categories = new ArrayList<String>();
     private ArrayAdapter<String> dataAdapter;
@@ -63,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        calendar_intent = getIntent();
+        mDate = calendar_intent.getStringExtra("Date");
+//        System.out.println("Cal")
+
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler);
 //        empty_view = (TextView)findViewById(R.id.empty_view);
         fab = (FloatingActionButton)findViewById(R.id.fab);
@@ -73,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,AddNewAlarm.class);
+                intent.putExtra("Date",mDate);
+
                 startActivity(intent);
             }
         });
@@ -100,7 +109,8 @@ public class MainActivity extends AppCompatActivity {
                                                                     public Alarm parseSnapshot(@NonNull DataSnapshot snapshot) {
                                                                         return new Alarm(snapshot.child("Label").getValue().toString(),
                                                                                         snapshot.child("Time").getValue().toString(),
-                                                                                        snapshot.child("Media URI").toString());
+                                                                                        snapshot.child("Media URI").toString(),
+                                                                                        snapshot.child("Date").getValue().toString());
                                                                     }
                                                                 })
                                                                 .build();
@@ -122,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position, @NonNull Alarm alarm) {
                 viewHolder.setLabelTitle(alarm.getMlabel());
                 viewHolder.setTimeTitle(alarm.getMtime());
+                viewHolder.setDateTitle(alarm.getDate());
 
                 viewHolder.delete.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -199,8 +210,9 @@ public class MainActivity extends AppCompatActivity {
                     String label = looping.child("Label").getValue(String.class);
                     String time = looping.child("Time").getValue(String.class);
                     String media = looping.child("Media URI").getValue(String.class);
+                    String date = looping.child("Date").getValue(String.class);
 
-                    Alarm userref = new Alarm(label,time,media);
+                    Alarm userref = new Alarm(label,time,media,date);
 
                     alarm_data.add(userref);
 
@@ -319,6 +331,7 @@ public class MainActivity extends AppCompatActivity {
         public LinearLayout root;
         public TextView Label;
         public TextView Time;
+        public TextView date;
         public ImageView delete;
 //        public Spinner mspinner;
 
@@ -327,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
             root = itemView.findViewById(R.id.root);
             Label = itemView.findViewById(R.id.Label);
             Time = itemView.findViewById(R.id.Time);
+            date = itemView.findViewById(R.id.Date);
 //            mspinner = itemView.findViewById(R.id.spinner1);
 
             delete = itemView.findViewById(R.id.delete);
@@ -341,10 +355,8 @@ public class MainActivity extends AppCompatActivity {
         {
             Label.setText(string);
         }
-        public void setTimeTitle(String string){
-
-            Time.setText(string);
-        }
+        public void setTimeTitle(String string){ Time.setText(string);    }
+        public void setDateTitle(String dateTitle){ date.setText(dateTitle); }
 
     }
 }

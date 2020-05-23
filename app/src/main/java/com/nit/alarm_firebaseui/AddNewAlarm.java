@@ -34,6 +34,8 @@ import java.util.UUID;
 
 public class AddNewAlarm extends AppCompatActivity {
 
+    private Intent main_intent;
+    private String mDate;
 
     private EditText label_alarm;
     private TextView time_alarm,media_for_alarm;
@@ -50,6 +52,11 @@ public class AddNewAlarm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_alarm);
+
+        main_intent = getIntent();
+        mDate = main_intent.getStringExtra("Date");
+        System.out.println("Date from Calendar "+mDate);
+
 
         label_alarm = (EditText)findViewById(R.id.label_alarm);
         time_alarm = (TextView) findViewById(R.id.time_alarm);
@@ -114,6 +121,7 @@ public class AddNewAlarm extends AppCompatActivity {
                 map.put("Label",label_alarm.getText().toString());
                 map.put("Time",time);
                 map.put("Media URI",downloadUri.toString());
+                map.put("Date",mDate);
 
                 databaseReference.setValue(map);
                 Intent intent = new Intent(AddNewAlarm.this,MainActivity.class);
