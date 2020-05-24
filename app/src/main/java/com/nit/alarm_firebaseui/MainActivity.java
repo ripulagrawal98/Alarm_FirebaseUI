@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
 
                 PendingIntent alarmIntent = PendingIntent.getBroadcast(this, i, activate, 0);
 //                System.out.println("Pending Intent");
-
+//                cal.set(Calendar.DAY_OF_MONTH,);
                 cal.set(Calendar.HOUR_OF_DAY, hour);
                 cal.set(Calendar.MINUTE, minute);
                 cal.set(Calendar.SECOND, 00);
@@ -307,7 +307,6 @@ public class MainActivity extends AppCompatActivity {
 //                    cal.add(Calendar.DATE,1);
 //                    i = 0;
 //                }
-
 
             }
 
@@ -355,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
         {
             Label.setText(string);
         }
-        public void setTimeTitle(String string){ Time.setText(string);    }
+        public void setTimeTitle(String string){ Time.setText(string); }
         public void setDateTitle(String dateTitle){ date.setText(dateTitle); }
 
     }
