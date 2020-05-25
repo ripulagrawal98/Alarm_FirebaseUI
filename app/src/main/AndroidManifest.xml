@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".LoginActivity" />
-        <activity android:name=".AuthenticationActivity">
+        <activity android:name=".CalendarActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".AfterAlarm" />
         <activity android:name=".AddNewAlarm" />
-        <activity android:name=".CalendarActivity" />
+        <activity android:name=".AuthenticationActivity" />
 
         <receiver
             android:name=".AlarmReceiver"

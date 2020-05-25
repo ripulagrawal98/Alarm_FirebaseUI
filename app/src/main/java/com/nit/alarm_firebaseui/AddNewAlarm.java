@@ -36,10 +36,12 @@ public class AddNewAlarm extends AppCompatActivity {
 
     private Intent main_intent;
     private String mDate;
+    private String mday_month,myear,mmonth;
 
     private EditText label_alarm;
     private TextView time_alarm,media_for_alarm;
     private String time;
+    private int total_minute;
     private Button upload;
     private Uri downloadUri;
     private FirebaseStorage mStorage = FirebaseStorage.getInstance();
@@ -55,6 +57,9 @@ public class AddNewAlarm extends AppCompatActivity {
 
         main_intent = getIntent();
         mDate = main_intent.getStringExtra("Date");
+        mday_month = main_intent.getStringExtra("day_month");
+        mmonth = main_intent.getStringExtra("month");
+        myear = main_intent.getStringExtra("year");
         System.out.println("Date from Calendar "+mDate);
 
 
@@ -85,6 +90,7 @@ public class AddNewAlarm extends AppCompatActivity {
 
                                                       time_alarm.setText(((hourOfDay < 10) ? "0" + hourOfDay : hourOfDay) + ":" + ((minute < 10) ? "0" + minute : minute));
                                                       mcurrentTime.set(mcurrentTime.HOUR_OF_DAY, hourOfDay);
+                                                      total_minute = (hourOfDay*60) + minute ;
 
                                           }
 
@@ -120,8 +126,13 @@ public class AddNewAlarm extends AppCompatActivity {
                 Map<String,Object> map = new HashMap<>();
                 map.put("Label",label_alarm.getText().toString());
                 map.put("Time",time);
+                map.put("Minute Total",String.valueOf(total_minute));
                 map.put("Media URI",downloadUri.toString());
                 map.put("Date",mDate);
+                map.put("DayMonth",mday_month);
+                map.put("Month",mmonth);
+                map.put("Year",myear);
+
 
                 databaseReference.setValue(map);
                 Intent intent = new Intent(AddNewAlarm.this,MainActivity.class);

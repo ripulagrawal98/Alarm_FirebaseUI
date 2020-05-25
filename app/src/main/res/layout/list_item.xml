@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="0dp"
+            android:background="@android:color/transparent"
             android:text="Label of Alarm" />
 
         <TextView
@@ -45,6 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="0dp"
+            android:background="@android:color/transparent"
             android:text="Date of Alarm" />
 
     </LinearLayout>

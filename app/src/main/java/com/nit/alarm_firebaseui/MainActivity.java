@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Intent calendar_intent;
     private String mDate;
+    private String mday_month,myear,mmonth;
 
     private RecyclerView mRecyclerView;
    private List<String> categories = new ArrayList<String>();
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
 
         calendar_intent = getIntent();
         mDate = calendar_intent.getStringExtra("Date");
+        mday_month = calendar_intent.getStringExtra("day_month");
+        mmonth = calendar_intent.getStringExtra("month");
+        myear = calendar_intent.getStringExtra("year");
 //        System.out.println("Cal")
 
         mRecyclerView = (RecyclerView)findViewById(R.id.recycler);
@@ -81,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,AddNewAlarm.class);
                 intent.putExtra("Date",mDate);
+                intent.putExtra("day_month",mday_month);
+                intent.putExtra("month",mmonth);
+                intent.putExtra("year",myear);
 
                 startActivity(intent);
             }
@@ -93,13 +100,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         fetch();
-        scheduleALarm();
+
     }
 
     private void fetch(){
 
         Query query = FirebaseDatabase.getInstance().getReference().child("Alarms");
 
+        System.out.println("Check if value of Date is already there "+mDate);
 
         System.out.println("HII");
         FirebaseRecyclerOptions<Alarm> options = new FirebaseRecyclerOptions.Builder<Alarm>()
@@ -110,7 +118,11 @@ public class MainActivity extends AppCompatActivity {
                                                                         return new Alarm(snapshot.child("Label").getValue().toString(),
                                                                                         snapshot.child("Time").getValue().toString(),
                                                                                         snapshot.child("Media URI").toString(),
-                                                                                        snapshot.child("Date").getValue().toString());
+                                                                                        snapshot.child("Date").getValue().toString(),
+                                                                                        snapshot.child("DayMonth").getValue().toString(),
+                                                                                        snapshot.child("Month").getValue().toString(),
+                                                                                        snapshot.child("Year").getValue().toString(),
+                                                                                snapshot.child("Minute Total").getValue().toString());
                                                                     }
                                                                 })
                                                                 .build();
@@ -192,11 +204,10 @@ public class MainActivity extends AppCompatActivity {
 
         };
         mRecyclerView.setAdapter(adapter);
+
+        scheduleALarm();
+
     }
-
-
-
-
 
     private void scheduleALarm(){
 
@@ -209,10 +220,14 @@ public class MainActivity extends AppCompatActivity {
                 for(DataSnapshot looping : dataSnapshot.getChildren()){
                     String label = looping.child("Label").getValue(String.class);
                     String time = looping.child("Time").getValue(String.class);
+                   String total_minutes = looping.child("Minute Total").getValue(String.class);
                     String media = looping.child("Media URI").getValue(String.class);
                     String date = looping.child("Date").getValue(String.class);
+                    String day_month = looping.child("DayMonth").getValue(String.class);
+                    String month = looping.child("Month").getValue(String.class);
+                    String year = looping.child("Year").getValue(String.class);
 
-                    Alarm userref = new Alarm(label,time,media,date);
+                    Alarm userref = new Alarm(label,time,media,date,day_month,month,year,total_minutes);
 
                     alarm_data.add(userref);
 
@@ -236,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
         int i =0;
         size = alarm_data.size();
 
+        Collections.sort(alarm_data);
         Calendar calendar = Calendar.getInstance();
         int currentHour = calendar.get(calendar.HOUR_OF_DAY);
         int currentMinute = calendar.get(calendar.MINUTE);
@@ -248,7 +264,6 @@ public class MainActivity extends AppCompatActivity {
         {
             Alarm user = alarm_data.get(i);
             String nextTime = user.getMtime().substring(0,2) + ":" + user.getMtime().substring(3);
-
 
             int Hour = Integer.parseInt(nextTime.substring(0,2));
             int Minute = Integer.parseInt(nextTime.substring(3));
@@ -266,12 +281,11 @@ public class MainActivity extends AppCompatActivity {
         int hour = AlarmList.get(0)/60;
         int minute = AlarmList.get(0) %60;
 
-
         Calendar cal = Calendar.getInstance();
         AlarmManager alarms = (AlarmManager) this.getSystemService(ALARM_SERVICE);
         ArrayList<PendingIntent> intentArray = new ArrayList<>();
 
-//        System.out.println("IS this Schedule time calling");
+        //        System.out.println("IS this Schedule time calling");
         for(i = 0;i<alarm_data.size();i++)
         {
             String media_uri = alarm_data.get(i).getMedia_uri();
@@ -291,7 +305,9 @@ public class MainActivity extends AppCompatActivity {
 
                 PendingIntent alarmIntent = PendingIntent.getBroadcast(this, i, activate, 0);
 //                System.out.println("Pending Intent");
-//                cal.set(Calendar.DAY_OF_MONTH,);
+                cal.set(Calendar.DAY_OF_MONTH,25);
+                cal.set(Calendar.YEAR,2020);
+                cal.set(Calendar.MONTH,4);
                 cal.set(Calendar.HOUR_OF_DAY, hour);
                 cal.set(Calendar.MINUTE, minute);
                 cal.set(Calendar.SECOND, 00);
@@ -343,10 +359,6 @@ public class MainActivity extends AppCompatActivity {
 //            mspinner = itemView.findViewById(R.id.spinner1);
 
             delete = itemView.findViewById(R.id.delete);
-
-
-
-
 
         }
 
